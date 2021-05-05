@@ -1,0 +1,22 @@
+{
+  "name": "swagger-express-generator",
+  "version": "1.0.0",
+  "description": "Generate Express controller and models based on Swagger JSON",
+  "main": "index.js",
+  "scripts": {
+    "testTSF": "node index.js -I swagger.json -O generated -T ts"
+  },
+  "dependencies": {
+    "mustache": "^4.2.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ghzcool/swagger-express-generator.git"
+  },
+  "author": "Pavel Pirogov",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ghzcool/swagger-express-generator/issues"
+  },
+  "homepage": "https://github.com/ghzcool/swagger-express-generator#readme"
+}
