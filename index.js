@@ -66,7 +66,12 @@ const parseMethodName = (url, method) => {
   }).join('') + capitalize(method);
 };
 
-const parseClassName = tags => tags.map(tag => capitalize(tag)).join('') + 'Api';
+const parseMethodUrl = (url) => {
+  return url.split('{').join(':').split('}').join('');
+};
+
+const parseClassName = tags => tags.map(tag => capitalize(tag)).join('') + 'Controller';
+const parseClassPath = tags => tags.map(tag => tag).join('');
 
 const parseSchemaRef = schemaRef => {
   if (!schemaRef) {
@@ -99,6 +104,7 @@ Object.keys(paths).forEach(url => {
     const tags = endpoint.tags || [];
     const parameters = endpoint.parameters || [];
     let noParameters = false;
+    let noBodyParameters = true;
     let noRequestBody = false;
     if (parameters.length) {
       parameters[parameters.length - 1].last = true;
@@ -107,6 +113,10 @@ Object.keys(paths).forEach(url => {
         parameter.isArray = isSchemaArray(parameter.schema ? parameter.schema: parameter);
         parameter.nullable = parameter.schema ? !!parameter.schema.nullable : !parameter.required;
         parameter.inPath = parameter.in === 'path';
+        parameter.inBody = parameter.in === 'body';
+        if (parameter.in === 'body') {
+          noBodyParameters = false;
+        }
         parameter.inQuery = parameter.in === 'query';
       });
     } else {
@@ -129,7 +139,9 @@ Object.keys(paths).forEach(url => {
     }
     const responses = endpoint.responses || {};
     const className = parseClassName(tags);
+    const classPath = parseClassPath(tags);
     const name = parseMethodName(url, method);
+    const processedUrl = parseMethodUrl(url);
     const status200 = responses['200'] || {};
     const content = status200.content || {};
     let schema = 'any';
@@ -140,9 +152,12 @@ Object.keys(paths).forEach(url => {
     if (responseSchemas.length) {
       schema = parseSchema(responseSchemas[0].schema);
       jsonContent = !!responseSchemas.find(item => item.name.indexOf('json') !== -1);
+    } else {
+      jsonContent = !!(endpoint.produces || []).find(item => item.indexOf('json') !== -1);
     }
     if (!apisByName[className]) {
       apisByName[className] = {
+        classPath,
         methods: []
       };
     }
@@ -152,10 +167,12 @@ Object.keys(paths).forEach(url => {
       name,
       nameCaps,
       url,
+      processedUrl,
       method,
       isGet,
       parameters,
       noParameters,
+      noBodyParameters,
       noRequestBody,
       jsonBody,
       bodySchema,

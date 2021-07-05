@@ -8,7 +8,7 @@
 {{/info}}*/
 
 {{#model}}
-export class {{name}} {
+module.exports = class {{name}} {
 {{#properties}}
     {{name}}{{^nullable}}?{{/nullable}}: {{type}};
 {{/properties}}
@@ -18,5 +18,5 @@ export class {{name}} {
         this.{{name}} = obj.{{name}};
     {{/properties}}
     }
-}
+};
 {{/model}}
