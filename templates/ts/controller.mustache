@@ -1,0 +1,86 @@
+/*{{#info}}
+    {{title}} generated{{#description}}
+        {{description}}{{/description}}
+    version: {{version}}{{#contact}}
+        Contact name: {{name}}
+        Contact email: {{email}}
+        url: {{& url}}{{/contact}}
+{{/info}}*/
+{{#api}}
+{{#methods}}
+{{^noParameters}}
+
+export class {{nameCaps}}Args {
+{{#parameters}}
+    {{name}}{{#nullable}}?{{/nullable}}: {{type}};
+{{/parameters}}
+
+    constructor(args: {{nameCaps}}Args) {
+    {{#parameters}}
+        this.{{name}} = args.{{name}};
+    {{/parameters}}
+    }
+}
+{{/noParameters}}
+{{/methods}}
+
+export class {{name}} {
+    constructor() {
+    }
+{{#methods}}
+
+    {{name}}({{^noParameters}}args: {{nameCaps}}Args, {{/noParameters}}{{^noRequestBody}}body?: {{bodySchema}}, {{/noRequestBody}}options: MethodOptions | any = {}): Promise<{{schema}}> { {{^noParameters}}
+            const { {{#parameters}}{{name}}{{^last}}, {{/last}}{{/parameters}} } = args;{{/noParameters}}
+    const {fetchMethod, basePath, headers, getHeaders} = this.config;
+    let url = '{{& url}}';
+    {{#parameters}}
+        {{#inPath}}
+            url = url.split(['{', '}'].join('{{name}}')).join(encodeURIComponent(String({{name}})));
+        {{/inPath}}
+    {{/parameters}}
+    const params = new URLSearchParams();
+    {{#parameters}}
+        {{#inQuery}}
+            if ({{name}} !== undefined) {
+            {{#isArray}}
+                ({{name}} || []).forEach(item => {
+                params.append('{{name}}', item as any);
+                });
+            {{/isArray}}
+            {{^isArray}}
+                params.append('{{name}}', {{name}} as any);
+            {{/isArray}}
+            }
+        {{/inQuery}}
+    {{/parameters}}
+    const query = params.toString();
+    return new Promise((resolve, reject) => {
+    const promise = fetchMethod(basePath + url + (query ? '?' + query : ''), {
+    method: '{{method}}',
+    headers: {...headers, ...getHeaders(), {{#jsonBody}}
+        'Content-Type': 'application/json-patch+json',
+    {{/jsonBody}}...options.headers}{{^noRequestBody}},
+    body: 'object' === typeof body ? JSON.stringify(body) : body{{/noRequestBody}}
+    });
+    {{#jsonContent}}
+        if (options.returnResponse) {
+        promise.then(response => resolve(response as any));
+        } else {
+        promise.then(response => {
+        if (response.status === 200 || response.status === 204) {
+        return response.json();
+        } else {
+        reject(response);
+        }
+        }).then(data => resolve(data));
+        }
+    {{/jsonContent}}
+    {{^jsonContent}}
+        promise.then(response => resolve(response));
+    {{/jsonContent}}
+    promise.catch(error => reject(error));
+    });
+    }
+{{/methods}}
+}
+{{/api}}

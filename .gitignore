@@ -1,0 +1,7 @@
+
+# Dependency directories
+mode_modules/
+output/
+
+# IDE / Editor
+.idea

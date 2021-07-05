@@ -5,8 +5,9 @@ console.log('Generate Swagger React client API');
 
 const args = {
   input: './swagger.json',
-  output: './generated.js',
-  template: 'es6'
+  output: './output',
+  template: 'ts',
+  format: 'ts'
 };
 
 // TODO: update only things with comment // generated - remove this comment if file should not be automatically updated
@@ -23,14 +24,18 @@ for (let i = 0; i < process.argv.length; i++) {
     case "-T":
       args.template = process.argv[++i];
       break;
+    case "-F":
+      args.format = process.argv[++i];
+      break;
     default:
   }
 }
 
-const templatePath = args.customTemplate : __dirname + `/templates/${args.template}/class.mustache`;
+const templatePath = args.customTemplate || __dirname + `/templates/${args.template}`;
 
 const data = fs.readFileSync(args.input, { encoding: 'utf8', flag: 'r' });
-const template = fs.readFileSync(templatePath, { encoding: 'utf8', flag: 'r' });
+const controllerTemplate = fs.readFileSync(templatePath + '/controller.mustache', { encoding: 'utf8', flag: 'r' });
+const modelTemplate = fs.readFileSync(templatePath + '/model.mustache', { encoding: 'utf8', flag: 'r' });
 
 let parsed;
 try {
@@ -187,8 +192,20 @@ Object.keys(types).forEach(name => {
   });
 });
 
-const result = Mustache.render(template, { apis, models, info });
 
-fs.writeFileSync(args.output + '/class.js', result, { flag: 'w+' });
+apis.forEach(api => {
+  const result = Mustache.render(controllerTemplate, { api, info });
+  const path = args.output + '/controllers/' + api.name + '.' + args.format;
+  console.log('generated', path);
+  fs.writeFileSync(path, result, { flag: 'w+' });
+});
+
+models.forEach(model => {
+  const result = Mustache.render(modelTemplate, { model, info });
+  const path = args.output + '/models/' + model.name + '.' + args.format;
+  console.log('generated', path);
+  fs.writeFileSync(path, result, { flag: 'w+' });
+});
+
 
 console.log('DONE');
