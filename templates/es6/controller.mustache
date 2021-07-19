@@ -1,0 +1,45 @@
+/*{{#info}}
+    {{title}} generated{{#description}}
+        {{description}}{{/description}}
+    version: {{version}}{{#contact}}
+        Contact name: {{name}}
+        Contact email: {{email}}
+        url: {{& url}}{{/contact}}
+{{/info}}*/
+{{#api}}
+
+module.exports = class {{name}} {
+    constructor(app) {
+{{#methods}}
+        app.{{method}}('{{{processedUrl}}}', (req, res) => this.{{name}}(req, res));
+{{/methods}}
+        console.log('{{name}} registered');
+    }
+{{#methods}}
+
+    {{name}}(req, res) {
+    {{#jsonContent}}
+        res.setHeader('Content-Type', 'application/json-patch+json');
+    {{/jsonContent}}
+        const {body, params, query, headers} = req;
+        console.log('{{name}}', {body, params, query});
+
+        const session = sessionService.getSessionFromHeaders(headers);
+            this.employeeService.getSelf(session, self => {
+            if (self.role === this.employeeService.ROLE_ADMIN) {
+
+                /*doSomething().then(response => {
+                    res.send(response);
+                }).catch(error => {
+                    console.error(error);
+                    res.status(500).send(error);
+                });*/
+
+            } else {
+                res.status(403).end();
+            }
+        }, () => res.status(401).end(), error => res.status(500).send(error));
+    }
+{{/methods}}
+};
+{{/api}}

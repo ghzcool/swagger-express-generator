@@ -11,7 +11,7 @@
 module.exports = class {{name}} {
     constructor(private app: any) {
 {{#methods}}
-        app.{{method}}('{{{processedUrl}}}', this.{{name}});
+        app.{{method}}('{{{processedUrl}}}', (req: any, res: any) => this.{{name}}(req, res));
 {{/methods}}
         console.log('{{name}} registered');
     }

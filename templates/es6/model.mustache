@@ -1,0 +1,23 @@
+/*{{#info}}
+    {{title}} generated{{#description}}
+    {{description}}{{/description}}
+    version: {{version}}{{#contact}}
+    Contact name: {{name}}
+    Contact email: {{email}}
+    url: {{& url}}{{/contact}}
+{{/info}}*/
+
+{{#model}}
+module.exports = class {{name}} {
+{{#properties}}
+    {{name}};
+{{/properties}}
+
+    constructor(obj) {
+        obj = obj || {};
+    {{#properties}}
+        this.{{name}} = obj.{{name}};
+    {{/properties}}
+    }
+};
+{{/model}}

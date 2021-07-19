@@ -6,8 +6,8 @@ console.log('Generate Swagger React client API');
 const args = {
   input: './swagger.json',
   output: './output',
-  template: 'ts',
-  format: 'ts'
+  template: 'es6',
+  format: 'js'
 };
 
 // TODO: update only things with comment // generated - remove this comment if file should not be automatically updated

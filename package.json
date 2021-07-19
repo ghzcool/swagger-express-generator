@@ -4,7 +4,8 @@
   "description": "Generate Express controller and models based on Swagger JSON",
   "main": "index.js",
   "scripts": {
-    "testTS": "node index.js -I swagger.json -O output -T ts"
+    "testES6": "node index.js -I swagger.json -O output -T es6",
+    "testTS": "node index.js -I swagger.json -O output -T ts -F ts"
   },
   "dependencies": {
     "mustache": "^4.2.0"
