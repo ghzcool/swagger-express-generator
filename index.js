@@ -209,6 +209,9 @@ Object.keys(types).forEach(name => {
   });
 });
 
+if (!fs.existsSync(args.output + '/controllers')) {
+  fs.mkdirSync(args.output + '/controllers', {recursive: true});
+}
 
 apis.forEach(api => {
   const result = Mustache.render(controllerTemplate, { api, info });
@@ -216,6 +219,11 @@ apis.forEach(api => {
   console.log('generated', path);
   fs.writeFileSync(path, result, { flag: 'w+' });
 });
+
+
+if (!fs.existsSync(args.output + '/models')) {
+  fs.mkdirSync(args.output + '/models', {recursive: true});
+}
 
 models.forEach(model => {
   const result = Mustache.render(modelTemplate, { model, info });
